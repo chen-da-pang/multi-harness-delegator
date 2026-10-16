@@ -1,0 +1,7 @@
+# Matt Pocock workflow files (local only)
+.specs/
+.reviews/
+PR_BODY.md
+
+# Scratch work
+.scratch/
