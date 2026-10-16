@@ -30,6 +30,22 @@
 
 ## 快速开始
 
+### 安装 Git Hooks
+
+**首次 clone 后必须运行**：
+
+```bash
+./scripts/install-hooks.sh
+```
+
+这会安装 pre-commit hooks 来强制执行：
+- ✅ Matt 工作流（ticket 引用）
+- ✅ writing-for-agents 原则（no-ops、negation、context pointers）
+
+详见 [docs/GIT-HOOKS.md](docs/GIT-HOOKS.md)
+
+### 示例工作流
+
 ```
 用户："研究 React 19 新特性并生成示例"
 
