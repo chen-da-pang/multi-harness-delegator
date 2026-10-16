@@ -1,10 +1,29 @@
-# Grok Build Code Generation 模板
+# Grok Build 代码生成模板
 
-用于代码生成任务。
+**专长：代码生成质量高、额度充足**，默认选择。
 
-**模型**：Grok 4.6/4.7 (xAI)，500K 上下文，4 档推理级别
+**模型选项**：
+- **Grok 4.6** (xAI)：标准质量
+- **Grok 4.7** (xAI)：最新版本
 
-## 通用代码生成模板
+**能力**：
+- ✓ 代码生成质量高（验证过）
+- ✓ 类型提示、文档字符串、错误处理
+- ✓ JSON schema 强制验证
+- ✓ 500K 上下文
+- ✓ Extended thinking（11K+）
+- ✓ 额度充足
+
+**何时使用 Grok Build**：
+- 普通代码生成（验证过 50s）
+- 需要 JSON schema 验证输出
+- 需要 extended thinking
+- 默认选择
+
+**何时不用**：
+- 高难度编码 → ZCode GLM-5.3 或 Antigravity Opus 4.6
+
+## 代码生成模板
 
 ```
 Generate <description> code.
@@ -17,164 +36,53 @@ Requirements:
 
 Constraints:
 - Match project style in <reference file>
-- Max 200 lines (split into modules if needed)
-- No external dependencies unless approved
+- Max <N> lines
+- No external dependencies unless: <list>
 
 Output:
-1. Write code to file
+1. Write code to <path>
 2. Run tests
-3. Report: file path, test result, any issues
+3. Report results
+
+Use Grok's code generation capability.
 ```
 
-## 带测试的代码生成模板
+## 测试生成模板
 
 ```
-Generate <description> code with tests.
+Generate tests for <function/class> in <file>.
 
 Requirements:
-- Implementation file: <path>
-- Test file: <test_path>
-- Test framework: <pytest/jest/cargo test/etc>
-
-Implementation must include:
-- Type hints / type declarations
-- Error handling (try/catch, Result types, etc.)
-- Docstrings / JSDoc
-- Input validation
-
-Tests must include:
-- Happy path (normal inputs)
-- Edge cases (empty, null, boundary values)
-- Error cases (invalid inputs)
-
-Workflow:
-1. Write implementation
-2. Write tests
-3. Run tests
-4. If tests fail: fix and re-run
-5. Report: both file paths, test coverage, final status
-```
-
-## 脚本生成模板
-
-```
-Generate a <language> script that <task>.
-
-Requirements:
-- Shebang (if applicable)
-- Usage help (--help flag)
-- Input validation
-- Error messages to stderr
-- Exit codes (0 = success, 1 = error)
-
-Example usage:
-<show how the script will be invoked>
+- Framework: <test framework>
+- Coverage: edge cases, happy path, error cases
+- Mock: <dependencies to mock>
 
 Constraints:
-- Single file
-- Standard library only (no external deps)
-- Must handle missing files/network errors gracefully
+- Match existing test style
+- Each test: one assertion focus
+- Clear test names
 
-Output:
-1. Write script to <path>
-2. Make executable (chmod +x)
-3. Test with example inputs
-4. Report: file path, test result
+Use Grok for test generation.
 ```
 
-## 重构模板
-
-```
-Refactor <file path> to <goal>.
-
-Current issues:
-- <issue 1>
-- <issue 2>
-
-Refactoring goals:
-- <goal 1>
-- <goal 2>
-
-Constraints:
-- Keep existing functionality (no behavior changes)
-- Preserve public API
-- Add tests if missing
-
-Workflow:
-1. Read current code
-2. Write tests (if missing)
-3. Refactor
-4. Run tests
-5. Report: diff summary, test status
-```
-
-## API 客户端生成模板
-
-```
-Generate an API client for <API name>.
-
-Endpoints to cover:
-- <endpoint 1>: <method> <path>
-- <endpoint 2>: <method> <path>
-
-Client requirements:
-- Base URL configuration
-- Authentication (API key / OAuth / Bearer token)
-- Timeout handling
-- Retry logic (exponential backoff)
-- Type-safe request/response (TypeScript interfaces / Python dataclasses)
-- Error handling (network errors, rate limits, validation errors)
-
-Output structured code:
-1. Client class
-2. Type definitions
-3. Example usage
-4. Tests for at least 2 endpoints
-```
-
-## 数据处理管道模板
-
-```
-Generate a data processing pipeline: <input> → <output>.
-
-Pipeline stages:
-1. <stage 1>: <description>
-2. <stage 2>: <description>
-
-Requirements:
-- Handle missing data gracefully
-- Log progress (at least at stage boundaries)
-- Error handling (retry transient errors, fail fast on permanent errors)
-- Resumability (can continue from last successful stage)
-
-Output:
-1. Main pipeline file
-2. Tests with sample data
-3. Example run
-```
-
-## 已验证能力（从并行测试）
+## 已验证能力
 
 | 任务 | 结果 | 耗时 | 备注 |
 |------|------|------|------|
-| Python 合并脚本生成 | ✓ | 50s | 生产级代码带测试、类型提示、错误处理 |
+| Python 合并脚本 | ✓ | 50s | 类型提示、错误处理、测试 |
+| 生产级代码 | ✓ | 50s | 质量高 |
 
-## 生成质量标准
+## 与其他 Harness 对比
 
-**必须包含**：
-- [ ] 类型提示 / 类型声明
-- [ ] 错误处理
-- [ ] 文档字符串
-- [ ] 可运行（测试通过）
+| 能力 | Grok Build | Antigravity | ZCode |
+|-----|-----------|------------|-------|
+| 普通编码 | ✓ 推荐 | ✓ Sonnet/Opus | ✓ 可以 |
+| 高难度编码 | ✓ 不错 | ✓ Opus 最强 | ✓ 专长 |
+| 代码质量 | ✓ 高 | ✓ Opus 最高 | ✓ 高（深度推理） |
+| 速度 | 50s | 未测 | 未测 |
+| 额度 | 很多 | 普通 | 最多 |
 
-**应该包含**：
-- [ ] 输入验证
-- [ ] 单元测试
-- [ ] 示例用法
-
-## 使用建议
-
-- **优先用于**：需要深思熟虑的代码（算法、复杂逻辑）
-- **推理级别**：默认或 high（代码生成通常不需要 xhigh）
-- **验证方式**：生成后立即运行测试
-- **失败处理**：如果测试失败，明确指出错误信息重新生成
+**选择建议**：
+- 普通编码 → Grok Build（默认）
+- 高难度编码 → ZCode GLM-5.3 或 Antigravity Opus 4.6
+- 代码生成 → Grok Build（验证过）

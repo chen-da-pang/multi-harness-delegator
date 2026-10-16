@@ -1,262 +1,113 @@
 # ZCode 任务模板
 
-**优先使用 ZCode**（套餐额度最多），适合批量、长任务。
+**专长：高难度编码任务**，不适合多模态。
 
 **模型选项**：
-- **GLM-5.3** (Z.ai)：标准质量
-- **GLM-5.3-Flash** (Z.ai)：更快但质量略低
+- **GLM-5.3** (Z.ai)：标准质量，**高难度编码专长**
+- **GLM-5.3-Flash** (Z.ai)：更快但**智商最蠢**
 
-**能力**：
-- 1M 上下文、128K 输出
-- 始终推理（3 档级别，无法关闭）
-- 代码分析/生成、长文档处理
-- **能看图片/视频**（但比 Antigravity 慢）
+**能力边界（重要）**：
 
-**套餐状态**：✓ 额度最多，应优先使用
+**GLM-5.3**：
+- ✓ 高难度编码任务（这是它的专长）
+- ✓ 1M 上下文、128K 输出
+- ✓ 始终推理（3 档级别，无法关闭）
+- ✗ **没有多模态能力**
+  - 看图是通过调用 GLM-4.7 工具实现，**效果非常差**
+  - 不要把需要看图/视频的任务交给它
+  - 如果必须用它处理有图片的任务 → 先用 Grok/Antigravity 看完，用文字描述给它
 
-## 代码结构分析模板
+**GLM-5.3-Flash**：
+- ✓ 能看图片/视频
+- ✗ **听不到声音**
+- ✗ **智商最蠢**（在所有模型中最蠢）
+- ✗ 速度不快（不如 Gemini 3.8 Flash、Grok 4.7 Fast）
+- 建议：不要用，除非没有其他选择
+
+**套餐状态**：额度最多，但不意味着优先使用
+
+## 何时使用 ZCode
+
+**唯一推荐场景**：高难度编码任务
+- 复杂算法实现
+- 性能优化
+- 架构重构
+- 需要深度推理的代码生成
+
+**不要用于**：
+- 图片/视频分析 → 用 Grok/Antigravity
+- 需要听声音的任务 → 用 Grok/Antigravity
+- 普通编码任务 → 用 Grok Build（也不错）
+- 多模态任务 → GLM-5.3 没有多模态，GLM-5.3-Flash 太蠢
+
+## 代码分析模板
 
 ```
 Analyze code structure in <file path>.
 
 Extract:
 - Main functions/classes (name, purpose, signature, line range)
-- Architecture pattern (MVC, layered, microkernel, pipe-filter, event-driven, etc.)
-- External dependencies (imports, requires)
-- Internal dependencies (which functions call which)
+- Architecture pattern
+- External dependencies
 - Caching/optimization strategies
 - Error handling approach
-- Concurrency patterns (if any)
+- Complexity hotspots
 
 Output structured JSON:
 {
-  "functions": [
-    {"name": "...", "purpose": "...", "signature": "...", "lines": "10-30"}
-  ],
-  "classes": [
-    {"name": "...", "purpose": "...", "methods": [...], "lines": "50-100"}
-  ],
+  "functions": [...],
   "architecture": "...",
-  "dependencies": {
-    "external": ["lib1", "lib2"],
-    "internal": [{"caller": "funcA", "callee": "funcB"}]
-  },
-  "patterns": ["caching", "retry logic", "connection pooling"],
-  "complexity_hotspots": ["function X is 200 lines", "nested loops in Y"]
+  "dependencies": {...},
+  "patterns": [...],
+  "complexity_hotspots": [...]
 }
 
-Use ZCode's code understanding capabilities via ACP bridge at:
-/Users/wycm/Documents/ChatGPT/zcode-open-bridge-grok/packages/acp-bridge/zcode-acp-local
+Use ZCode's GLM-5.3 for deep code understanding.
 ```
 
-## 代码库地图模板
+## 高难度代码生成模板
 
 ```
-Build architecture map of <directory>.
+Generate <description> code.
 
-Extract:
-- Directory structure (modules/packages)
-- Entry points (main, index, etc.)
-- Key abstractions (core classes/interfaces)
-- Data flow (how data moves through the system)
-- External integrations (APIs, databases, file I/O)
-- Configuration files
+Requirements:
+- Language: <lang>
+- Complexity: high (algorithms/optimization/architecture)
+- Must include: error handling, type hints, docstrings, tests
+- Performance constraints: <if any>
 
-Output structured JSON:
-{
-  "structure": {
-    "src/": {
-      "utils/": ["file1.py", "file2.py"],
-      "core/": [...]
-    }
-  },
-  "entry_points": ["src/main.py"],
-  "key_abstractions": [
-    {"name": "Parser", "file": "...", "role": "..."}
-  ],
-  "data_flow": "linear / branching / circular",
-  "integrations": [
-    {"type": "database", "name": "PostgreSQL", "connection": "..."}
-  ],
-  "config_files": ["config.yml", ".env.example"]
-}
+Constraints:
+- Match project style in <reference file>
+- Optimize for <metric>
+
+Use ZCode's GLM-5.3 for complex code generation with deep reasoning.
 ```
 
-## 依赖分析模板
+## 变通方案（有图片时）
 
 ```
-Analyze dependencies in <project directory>.
+[Step 1: 先用 Grok/Antigravity 看图]
+Agent({ name: "grok-analyze-image", prompt: "Analyze <image>. Describe what you see in text." })
 
-Extract:
-- Direct dependencies (from package.json / requirements.txt / Cargo.toml / go.mod)
-- Transitive dependencies (what your deps depend on)
-- Outdated packages (current version vs latest)
-- Security vulnerabilities (if detectable)
-- Dependency graph (who depends on what)
-- License issues (GPL mixed with proprietary, etc.)
+[Step 2: 等结果]
 
-Output structured JSON:
-{
-  "direct": [
-    {"name": "lodash", "version": "4.17.21", "latest": "4.17.21", "outdated": false}
-  ],
-  "transitive": [...],
-  "vulnerabilities": [
-    {"package": "...", "severity": "high", "fix": "upgrade to X"}
-  ],
-  "graph": {
-    "lodash": ["internal-util", "api-handler"]
-  },
-  "license_issues": []
-}
+[Step 3: 用文字描述给 ZCode]
+Agent({ 
+  name: "zcode-implement", 
+  prompt: "Implement <complex algorithm> based on this diagram:
+  
+  [Paste text description from step 1]
+  
+  <complex requirements>"
+})
 ```
 
-## 代码质量审查模板
-
-```
-Review code quality in <file path>.
-
-Check:
-- Function length (flag functions > 50 lines)
-- Cyclomatic complexity (flag > 10)
-- Duplicate code (similar blocks)
-- Naming consistency
-- Error handling coverage
-- Test coverage (if tests exist)
-- Documentation completeness
-
-Output structured JSON:
-{
-  "issues": [
-    {"type": "long_function", "name": "...", "lines": 120, "location": "file:42"},
-    {"type": "duplicate", "instances": ["file1:10-20", "file2:30-40"]},
-    {"type": "high_complexity", "name": "...", "complexity": 15}
-  ],
-  "metrics": {
-    "avg_function_length": 25,
-    "max_complexity": 15,
-    "test_coverage": "75%",
-    "documented_functions": "60%"
-  },
-  "recommendations": [
-    "Extract funcX into smaller pieces",
-    "Add error handling to Y",
-    "Write tests for Z"
-  ]
-}
-```
-
-## 迁移影响分析模板
-
-```
-Analyze impact of migrating from <old tech> to <new tech> in <project>.
-
-Identify:
-- Files that directly use <old tech>
-- Files that indirectly depend on it
-- API surface that would change
-- Tests that would need updates
-- Configuration changes
-- Estimated effort (file count, line count)
-
-Output structured JSON:
-{
-  "direct_usage": [
-    {"file": "...", "lines": [...], "usage_type": "import/call/extend"}
-  ],
-  "indirect_dependencies": [...],
-  "api_changes": [
-    {"old": "funcA()", "new": "funcB()", "affected_callers": 12}
-  ],
-  "test_updates": ["test/integration/..."],
-  "config_changes": ["package.json", "tsconfig.json"],
-  "effort_estimate": {
-    "files": 45,
-    "lines": 3200,
-    "risk": "medium"
-  }
-}
-```
-
-## 性能瓶颈分析模板
-
-```
-Identify performance bottlenecks in <file path or directory>.
-
-Look for:
-- Nested loops (O(n²) or worse)
-- Repeated database queries (N+1 problem)
-- Large data loaded into memory
-- Synchronous I/O in hot paths
-- Missing indices (if DB schema visible)
-- Inefficient algorithms
-
-Output structured JSON:
-{
-  "hotspots": [
-    {
-      "location": "file:line",
-      "issue": "nested loop",
-      "complexity": "O(n²)",
-      "impact": "high",
-      "suggestion": "use hash map lookup"
-    }
-  ],
-  "io_issues": [
-    {"location": "...", "issue": "blocking file read in loop"}
-  ],
-  "db_issues": [
-    {"query": "...", "issue": "missing index on user_id"}
-  ]
-}
-```
-
-## 已验证能力（从并行测试）
+## 已验证能力
 
 | 任务 | 结果 | 耗时 | 备注 |
 |------|------|------|------|
 | 代码分析（199行并发爬虫） | ✓ | 67s | 识别 7 个函数、两阶段架构、外部依赖、缓存策略 |
-
-**测试案例**：
-- 文件：`full_collect_tikhub.py`
-- 识别：7 个函数、两阶段架构、`tikhub_transport` 依赖、缓存策略
-- 桥接：通过 stdio 连接 ACP 桥
-- 输出：结构化 JSON
-
-## 图片/视频分析模板（ZCode 也能做）
-
-```
-Analyze image/video at <file path>.
-
-Extract:
-- Visual theme
-- Dominant emotions
-- Key elements
-- Color palette
-
-Output structured JSON.
-
-Note: ZCode's GLM-5.3-Flash can handle images/videos but is slower than Antigravity's Gemini 3.8.
-Use ZCode for batch analysis (cost-effective) or when not time-sensitive.
-```
-
-## 使用建议
-
-- **优先用于**：大部分任务（额度最多 ✓）
-  - 代码分析/生成
-  - 长文档处理
-  - 批量图片/视频分析（不急的）
-  - 需要大输出的任务（128K 上限）
-- **上下文优势**：1M tokens
-- **输出优势**：128K tokens（可生成详细架构报告）
-- **推理模式**：始终推理，3 档级别
-- **多模态**：能看图片/视频，但比 Antigravity 慢
-
-## 何时不用 ZCode
-
-- X (Twitter) 数据 → 用 Grok Build（X API 访问权）
-- 图片/视频需要快速结果（<20s）→ 用 Antigravity（Gemini 快）
-- 关键任务需要最强模型 → 用 Antigravity Opus 4.6
+| 高难度编码 | 未测 | - | 用户反馈：这是它的专长 |
 
 ## ACP 桥集成
 
@@ -277,15 +128,16 @@ ZCode 通过 ACP 桥集成：
 
 ## 与其他 Harness 对比
 
-| 能力 | ZCode | Grok Build | Antigravity |
-|-----|-------|-----------|-------------|
-| 代码分析 | ✓ 67s（验证） | 未测 | 未测 |
-| 代码生成 | 未测 | ✓ 50s（验证） | 未测 |
+| 能力 | ZCode GLM-5.3 | Grok Build | Antigravity |
+|-----|--------------|-----------|-------------|
+| 高难度编码 | ✓ 专长 | ✓ 也不错 | ✓ Opus 4.6 最强 |
+| 普通编码 | ✓ 可以 | ✓ 推荐 | ✓ Sonnet 4.6 |
+| 多模态 | ✗ 无（调 GLM-4.7 效果差） | ✓ 有 | ✓ Gemini 强 |
 | 长上下文 | 1M | 500K | 1M |
 | 大输出 | 128K | 未知 | 未知 |
-| 推理模式 | 始终开启 | 4 档可选 | 高级别可选 |
 
-建议：
-- 代码分析 → ZCode 或 Grok Build（都准确）
-- 代码生成 → Grok Build（验证过质量）
-- 长任务 → ZCode（长任务优化）
+**选择建议**：
+- 高难度编码 → ZCode GLM-5.3 或 Antigravity Opus 4.6
+- 普通编码 → Grok Build（默认）
+- 代码分析 → Grok Build / ZCode GLM-5.3
+- 有图片/视频 → Grok Build / Antigravity（不要用 ZCode）

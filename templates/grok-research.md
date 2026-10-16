@@ -1,10 +1,30 @@
-# Grok Build Research 模板
+# Grok Build 调研任务模板
 
-用于搜索、调研、X (Twitter) 数据采集。
+**专长：X (Twitter) API 访问权、多模态快、额度充足**，默认选择。
 
-**模型**：Grok 4.6/4.7 (xAI)，500K 上下文，4 档推理级别
+**模型选项**：
+- **Grok 4.6** (xAI)：标准质量
+- **Grok 4.7** (xAI)：最新版本
+- **Grok 4.7 Fast** (xAI)：快速模式
 
-## 通用 Research 模板
+**能力**：
+- ✓ **X (Twitter) API 访问权**（唯一）
+- ✓ 多模态快（图片 17.6s 验证）
+- ✓ 500K 上下文
+- ✓ 4 档推理级别（包括 xhigh）
+- ✓ Extended thinking（11K+ tokens）
+- ✓ JSON schema 强制验证
+- ✓ 子进程集成（可调用外部 CLI）
+- ✓ 额度充足
+
+**何时使用 Grok Build**：
+- 需要 X (Twitter) 数据（唯一有 API）
+- 快速图片/视频分析（验证过 17.6s）
+- 需要 extended thinking（11K+）
+- 需要 JSON schema 验证
+- 默认选择（能力全面、额度充足）
+
+## Research 模板
 
 ```
 Research <topic>.
@@ -15,198 +35,77 @@ Requirements:
 3. Output structured JSON:
    {
      "summary": "...",
-     "key_points": [
-       {"point": "...", "source": "URL", "date": "2026-XX-XX"}
-     ],
-     "sources": [
-       {"url": "...", "title": "...", "credibility": "official/media/blog"}
-     ]
+     "key_points": [...],
+     "sources": [{"url": "...", "title": "...", "date": "..."}]
    }
 
 Constraints:
 - Only use information from 2024-2026
-- Cite specific URLs (not just domains)
-- Ignore speculation or unverified claims
-- Prefer official docs > known media > personal blogs
+- Cite specific URLs
+- Ignore speculation
+- Verify facts from multiple sources
+
+Use Grok's web search capability and extended thinking.
 ```
 
 ## X (Twitter) 数据采集模板
 
 ```
-Search X (formerly Twitter) for <query>.
+Collect X (Twitter) data about <topic>.
 
 Requirements:
-1. Use your X API access (xAI product advantage)
-2. Time range: <date range>
-3. Filter: <verified accounts / all / by engagement>
-4. Extract:
-   - Tweet text
-   - Author info (username, verified, followers)
-   - Engagement (likes, retweets, views)
-   - Timestamp
-   - Media attachments (URLs)
+1. Search X posts from <date range>
+2. Filter by <criteria>
+3. Extract: username, post text, timestamp, likes, retweets, comments
+4. Output structured JSON array
 
-Output structured JSON:
-{
-  "query": "...",
-  "time_range": "...",
-  "results": [
-    {
-      "id": "...",
-      "author": {"username": "...", "verified": true, "followers": 123456},
-      "text": "...",
-      "engagement": {"likes": 100, "retweets": 50, "views": 10000},
-      "timestamp": "2026-10-16T10:00:00Z",
-      "media": ["https://..."]
-    }
-  ],
-  "summary": {
-    "total_results": 50,
-    "sentiment_distribution": {"positive": 20, "neutral": 15, "negative": 15}
-  }
-}
+Constraints:
+- Only verified information
+- Respect rate limits
+- No personal data beyond public posts
 
-Do NOT fabricate tweets. Only return real data from X API.
+Use Grok's X API access (xAI is X's product).
 ```
 
-## 对比研究模板
+## Extended Thinking 模板
 
 ```
-Compare <option A> vs <option B>.
-
-Research dimensions:
-1. Performance (benchmarks, real-world data)
-2. Ease of use (learning curve, API design)
-3. Community (adoption, ecosystem, support)
-4. Cost (licensing, hosting, operational)
-5. Maturity (release history, stability, breaking changes)
-
-For each dimension:
-- Find concrete data (not opinions)
-- Cite sources
-- Note recency (2024-2026 preferred)
-
-Output structured JSON:
-{
-  "comparison": [
-    {
-      "dimension": "Performance",
-      "option_a": {"score": "...", "evidence": "...", "source": "URL"},
-      "option_b": {"score": "...", "evidence": "...", "source": "URL"},
-      "winner": "A/B/tie"
-    }
-  ],
-  "overall_recommendation": "..."
-}
-```
-
-## 技术栈调研模板
-
-```
-Research <technology/framework> for <use case>.
-
-Questions to answer:
-1. What is it? (purpose, category, alternatives)
-2. Who uses it? (notable adopters, case studies)
-3. How mature is it? (first release, latest version, breaking changes)
-4. What are its strengths? (unique features, benchmarks)
-5. What are its weaknesses? (known issues, limitations)
-6. How active is development? (commit frequency, issue response time)
-7. What's the learning curve? (docs quality, tutorial availability)
-
-Output structured JSON:
-{
-  "overview": {"name": "...", "category": "...", "first_release": "..."},
-  "adopters": [{"company": "...", "source": "URL"}],
-  "maturity": {"latest_version": "...", "stability": "production/beta/alpha"},
-  "strengths": ["...", "..."],
-  "weaknesses": ["...", "..."],
-  "activity": {"commits_last_month": 50, "avg_issue_response": "2 days"},
-  "learning_curve": "easy/medium/steep"
-}
-```
-
-## 最佳实践汇总模板
-
-```
-Compile best practices for <topic>.
-
-Sources to check:
-- Official docs (language/framework guides)
-- Well-known engineering blogs (Google, Meta, Netflix, etc.)
-- Popular GitHub repos (>10K stars) with good practices
-- Recent conference talks (2024-2026)
-
-For each practice:
-- Name it concisely
-- Explain why it's recommended
-- Give a code example (if applicable)
-- Cite source
-
-Output structured JSON:
-{
-  "best_practices": [
-    {
-      "name": "...",
-      "rationale": "...",
-      "example": "code snippet or description",
-      "source": "URL",
-      "adoption": "widely adopted / emerging / controversial"
-    }
-  ]
-}
-```
-
-## 漏洞/安全研究模板
-
-```
-Research security vulnerabilities in <software/library>.
+<Complex reasoning task requiring deep analysis>
 
 Requirements:
-1. Search CVE databases, security advisories, GitHub security alerts
-2. Time range: <date range>
-3. For each vulnerability:
-   - CVE ID (if assigned)
-   - Severity (critical/high/medium/low)
-   - Affected versions
-   - Fixed version
-   - Exploit availability (proof-of-concept exists?)
-   - Mitigation steps
+<detailed requirements>
 
-Output structured JSON:
-{
-  "vulnerabilities": [
-    {
-      "cve_id": "CVE-2026-XXXXX",
-      "severity": "high",
-      "affected_versions": "< 3.2.1",
-      "fixed_version": "3.2.1",
-      "description": "...",
-      "exploit_available": true,
-      "source": "URL"
-    }
-  ],
-  "summary": {
-    "total": 5,
-    "critical": 1,
-    "high": 2,
-    "recommendation": "Upgrade to X.X.X immediately"
-  }
-}
+Constraints:
+- Use extended thinking (11K+ reasoning tokens)
+- Show reasoning steps
+- Verify conclusions
+
+Use Grok's extended thinking capability for deep reasoning.
 ```
 
-## 已验证能力（从并行测试）
+## 已验证能力
 
 | 任务 | 结果 | 耗时 | 备注 |
 |------|------|------|------|
-| 结构化输出（JSON schema） | ✓ | 120s | 使用 `--json-schema` 强制验证 |
-| 外部工具调用（agy CLI） | ✓ | 17.6s | 子进程集成成功 |
-| 多步推理（文档对比） | ✓ | 50-52s | 4 次工具调用 |
-| 扩展推理 | ✓ | - | 11K+ 推理 tokens |
+| 结构化输出（JSON schema） | ✓ | 120s | 从 300 条评论提取情绪 |
+| 外部工具集成 | ✓ | 17.6s | 调用 agy CLI 分析图片 |
+| 多步推理 | ✓ | 50-52s | 对比文档、找差异 |
+| 代码生成 | ✓ | 50s | 生产级代码带测试 |
+| 图片分析 | ✓ | 17.6s | 通过 agy CLI |
 
-## 使用建议
+## 与其他 Harness 对比
 
-- **优先用于**：X 数据、深度推理、JSON schema 验证
-- **推理级别**：默认 / high / xhigh / max（选择 xhigh 用于复杂问题）
-- **上下文限制**：500K tokens（比 Antigravity/ZCode 的 1M 小）
-- **无头模式**：使用 `--always-approve` 和管道输入
+| 能力 | Grok Build | Antigravity | ZCode |
+|-----|-----------|------------|-------|
+| X API | ✓ 唯一 | - | - |
+| 多模态 | ✓ 快 | ✓ Gemini 强 | ✗ GLM-5.3 无，GLM-5.3-Flash 蠢 |
+| Extended thinking | ✓ 11K+ | - | ✓ 始终推理 |
+| 编码 | ✓ 不错 | ✓ Opus 最强 | ✓ 高难度专长 |
+| JSON schema | ✓ 有 | 未知 | 未知 |
+| 额度 | 很多 | 普通 | 最多 |
+
+**选择建议**：
+- X 数据 → Grok Build（唯一）
+- 图片/视频快速分析 → Grok 4.7 Fast 或 Antigravity Gemini
+- 需要 extended thinking → Grok Build
+- 默认选择 → Grok Build（能力全面、额度充足）

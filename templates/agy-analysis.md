@@ -1,13 +1,36 @@
-# Antigravity CLI (agy) Analysis 模板
+# Antigravity (agy) 任务模板
 
-用于图片/视频快速分析、顶级任务。
+**专长：多模型选择**，可选 Gemini、Claude Sonnet、Claude Opus。
 
 **模型选项**：
-- **Gemini 3.8 Flash** (Google)：快速、多模态强
-- **Claude Sonnet 4.6** (Anthropic)：平衡质量和速度
-- **Claude Opus 4.6** (Anthropic)：最强模型，用于关键任务
+- **Gemini 3.8 Flash** (Google)：快速多模态，图片/视频分析强
+- **Claude Sonnet 4.6** (Anthropic)：平衡性能
+- **Claude Opus 4.6** (Anthropic)：顶级模型，最强智商
 
-**上下文**：1M tokens
+**能力**：
+- ✓ 1M 上下文
+- ✓ Gemini 多模态强且快
+- ✓ 可选顶级 Opus 4.6
+- ✓ MCP 支持
+- ✓ Go 性能
+
+**模型智商排序**：
+1. Claude Opus 4.6 ← 最强
+2. Claude Sonnet 4.6
+3. Gemini 3.8 Flash
+
+## 何时使用 Antigravity
+
+**推荐场景**：
+- 快速图片分析（Gemini 3.8 Flash）
+- 快速视频分析（Gemini 3.8 Flash）
+- 需要顶级模型的任务（Opus 4.6）
+- 多模态任务（Gemini 专长）
+
+**模型选择建议**：
+- 图片/视频分析 → Gemini 3.8 Flash（17.6s 验证过）
+- 顶级任务 → Opus 4.6
+- 平衡任务 → Sonnet 4.6
 
 ## 图片分析模板
 
@@ -15,28 +38,22 @@
 Analyze image at <file path>.
 
 Extract:
-- Visual theme (e.g., dark/light, minimalist/complex, professional/casual)
-- Dominant emotions (from closed set: <list emotions>)
-- Key visual elements (people, objects, text, symbols)
-- Color palette (top 3-5 dominant colors with hex codes)
-- Text content (OCR if text is present)
-- Composition style (centered, rule-of-thirds, symmetry, etc.)
+- Visual theme
+- Dominant emotions (from closed set: joy, sadness, anger, fear, surprise, neutral, despair, vulnerable, isolated, pain)
+- Key visual elements
+- Color palette (specific hex codes or descriptive names)
+- Text content (if any)
 
 Output structured JSON:
 {
   "theme": "...",
-  "emotions": ["emotion1", "emotion2"],
-  "elements": [
-    {"type": "person/object/text", "description": "...", "location": "..."}
-  ],
-  "colors": [
-    {"name": "...", "hex": "#...", "percentage": 30}
-  ],
-  "text": "...",
-  "composition": "..."
+  "emotions": [...],
+  "elements": [...],
+  "colors": [...],
+  "text": "..."
 }
 
-Use Gemini's native multimodal capabilities.
+Use Antigravity's Gemini 3.8 Flash for fast multimodal analysis.
 ```
 
 ## 视频分析模板
@@ -45,162 +62,67 @@ Use Gemini's native multimodal capabilities.
 Analyze video at <file path>.
 
 Extract:
-- Visual theme across the video
-- Emotional arc (how emotions change over time)
-- Key scenes (with timestamps)
-- Dominant colors per scene
-- Audio characteristics (if audio track exists)
-- Pacing (fast/slow cuts, transitions)
+- Main subjects/actions
+- Scene changes (timestamps)
+- Mood progression
+- Audio content (if any)
+- Key frames (timestamps + descriptions)
 
 Output structured JSON:
 {
-  "theme": "...",
-  "emotional_arc": [
-    {"timestamp": "00:00", "emotions": ["..."]},
-    {"timestamp": "00:30", "emotions": ["..."]}
-  ],
-  "key_scenes": [
-    {"timestamp": "00:15", "description": "...", "significance": "..."}
-  ],
-  "colors": [...],
-  "pacing": "..."
+  "subjects": [...],
+  "scenes": [...],
+  "mood_progression": [...],
+  "audio_summary": "...",
+  "key_frames": [...]
 }
 
-Use Gemini's video understanding capabilities.
+Use Antigravity's Gemini 3.8 Flash for multimodal video analysis.
 ```
 
-## 批量图片分析模板
+## 顶级任务模板
 
 ```
-Analyze all images in <directory>.
+<Complex task requiring highest intelligence>
 
-For each image:
-- Theme
-- Top 2 emotions
-- Presence of faces (yes/no)
-- Text content (if any)
+Requirements:
+<detailed requirements>
 
-Output structured JSON array:
-{
-  "images": [
-    {"path": "...", "theme": "...", "emotions": [...], "has_faces": true, "text": "..."},
-    ...
-  ],
-  "summary": {
-    "total": 50,
-    "dominant_theme": "...",
-    "emotional_distribution": {"happy": 20, "sad": 15, ...}
-  }
-}
-
-Process in parallel if possible. Use Gemini's batch processing if available.
+Use Antigravity's Claude Opus 4.6 for maximum capability.
 ```
 
-## 封面图质量评估模板
+## 已验证能力
 
-```
-Evaluate <file path> as a video/article cover.
+| 任务 | 模型 | 结果 | 耗时 | 备注 |
+|------|------|------|------|------|
+| 图片分析 | Gemini（通过 agy CLI） | ✓ | 17.6s | 识别主题、情绪、颜色、文字 |
+| 视频分析 | 未测 | - | - | 应该也快 |
+| 顶级任务 | Opus 4.6 | 未测 | - | 理论上最强 |
 
-Criteria:
-- Visual appeal (1-10)
-- Emotional impact (1-10)
-- Clarity (is the subject clear?) (1-10)
-- Composition quality (rule-of-thirds, balance) (1-10)
-- Text legibility (if text present) (1-10)
+## CLI 集成
 
-Output structured JSON:
-{
-  "scores": {
-    "appeal": 8,
-    "impact": 7,
-    "clarity": 9,
-    "composition": 7,
-    "text_legibility": 6
-  },
-  "overall_score": 7.4,
-  "strengths": ["Strong emotional impact", "Clear subject"],
-  "weaknesses": ["Text too small", "Composition slightly off-center"],
-  "recommendation": "use as-is / crop / replace"
-}
+Antigravity 可以通过 `agy` CLI 调用：
+
+```bash
+# 图片分析示例（通过 Grok 子进程调用）
+agy analyze <image_path> --output-json
+
+# 返回结构化 JSON
 ```
 
-## 截图内容提取模板
+## 与其他 Harness 对比
 
-```
-Extract structured information from screenshot at <file path>.
+| 能力 | Antigravity | Grok Build | ZCode |
+|-----|------------|-----------|-------|
+| 图片分析 | ✓ 快（17.6s） | ✓ 快 | ✗ 慢且蠢 |
+| 视频分析（有声） | ✓ 有 | ✓ 有 | ✗ 听不到 |
+| 视频分析（无声） | ✓ 快 | ✓ 快 | ✗ 蠢 |
+| 顶级模型 | ✓ Opus 4.6 | - | - |
+| 编码 | ✓ Sonnet/Opus | ✓ 不错 | ✓ 高难度专长 |
+| X API | - | ✓ 有 | - |
 
-Expected content type: <UI/dashboard/document/chart/etc>
-
-Extract:
-- All visible text (with bounding boxes if important)
-- UI elements (buttons, forms, menus)
-- Data visualization (if present: chart type, trends)
-- Errors or alerts (if any)
-
-Output structured JSON:
-{
-  "content_type": "...",
-  "text": [
-    {"text": "...", "location": "top-left/center/etc", "type": "heading/body/button"}
-  ],
-  "ui_elements": [
-    {"type": "button", "label": "Submit", "state": "enabled/disabled"}
-  ],
-  "visualizations": [
-    {"type": "line chart", "trend": "increasing", "data_points": 12}
-  ],
-  "alerts": ["Error: Connection failed"]
-}
-```
-
-## 已验证能力（从并行测试）
-
-| 任务 | 结果 | 耗时 | 备注 |
-|------|------|------|------|
-| 图片分析（视频封面） | ✓ | 17.6s | 识别视觉主题、情绪、颜色、确认无文字 |
-
-**测试案例**：
-- 文件：`7674506336575903461_cover.jpg`
-- 识别：黑暗/电影感、绝望/脆弱/悲伤/孤立/痛苦、近黑色/石板蓝灰/淡米色
-- 质量：细致、细腻、准确
-
-## 使用建议
-
-- **优先用于**：
-  - 图片/视频快速分析（Gemini 3.8 多模态快）
-  - 关键任务需要最强模型（切换到 Opus 4.6）
-  - 速度优先的任务（17.6s 验证）
-- **模型选择**：
-  - 图片/视频 → Gemini 3.8 Flash（多模态专长）
-  - 复杂推理 → Claude Sonnet 4.6（平衡）
-  - 关键任务 → Claude Opus 4.6（最强）
-- **上下文优势**：1M tokens（可处理大批量图片）
-- **速度**：17.6s（已验证，快速）
-- **命令行调用**：可作为 CLI 子进程集成到 Grok Build 任务中
-
-## 何时不用 Antigravity
-
-- 不急的批量图片/视频分析 → 用 ZCode（额度更多，虽然慢）
-- X (Twitter) 数据 → 用 Grok Build（X API 访问权）
-- 普通任务 → 用 ZCode（额度优先）
-
-## 与 Grok Build 集成
-
-Grok Build 可以调用 Antigravity CLI 作为外部工具：
-
-```python
-# 在 Grok Build agent 中
-import subprocess
-import json
-
-result = subprocess.run(
-    ["agy", "analyze-image", "/path/to/image.jpg", "--output-json"],
-    capture_output=True,
-    text=True
-)
-
-analysis = json.loads(result.stdout)
-# 使用 analysis 结果继续任务
-```
-
-这种集成模式已在并行测试中验证成功（17.6s）。
+**选择建议**：
+- 图片/视频分析 → Antigravity Gemini 3.8 或 Grok 4.7 Fast
+- 顶级任务 → Antigravity Opus 4.6
+- 普通任务 → Grok Build（默认）
+- 高难度编码 → ZCode GLM-5.3 或 Antigravity Opus 4.6
