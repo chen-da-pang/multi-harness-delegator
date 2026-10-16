@@ -4,7 +4,8 @@
 
 ## 版本
 
-- v0.1.3 (2026-10-16)
+- v0.2.0 (2026-10-16) - 新增编排模式实战（Market Research、Full-stack App、Multi-image Analysis）
+- v0.1.3 (2026-10-16) - 能力边界修正 + Matt 流程说明
 
 ## 概述
 
