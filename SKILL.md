@@ -40,18 +40,19 @@
 - 使用建议：纯编码任务，或先用别的看完图片，再用文字描述给他
 
 **GLM-5.3-Flash**（ZCode 快速）：
-- ✓ 能看图片/视频
-- ✗ **听不到声音**
-- ✗ **智商最蠢**
-- ✗ 速度不快（不如 Gemini 3.8 Flash、Grok 4.7 Fast）
+- ✓ 能看图片/视频（**唯一能看视频的模型**）
+- ✗ **视频分析听不到音频**
+- ✗ **在非多模态任务时智商低**（代码、推理等任务慢且蠢）
+- ✗ 速度慢（不如 Gemini 3.8 Flash、Grok 4.7 Fast）
 
 **Grok 4.7 Fast**：
-- ✓ 多模态快
+- ✓ 看图快
+- ✗ **不能看视频**
 - ✓ 额度多
 
 **Gemini 3.8 Flash**：
-- ✓ 多模态强且快
-- ✓ 速度快
+- ✓ 看图强且快
+- ✗ **不能看视频**
 
 **选择原则**：按任务类型选，不是按额度选
 
@@ -77,8 +78,9 @@
   └─ No → 继续
 
 任务需要多模态（看图/视频/听声音）？
-  └─ Yes & 需要听声音 → Grok Build / Antigravity（GLM 听不到）
-  └─ Yes & 不需要听声音 → Grok 4.7 Fast / Gemini 3.8 Flash（都快）
+  └─ Yes & 需要看**视频**（无论是否有声） → ZCode GLM-5.3-Flash（**唯一能看视频**）
+  └─ Yes & 需要听**声音** → Grok Build / Antigravity（但**不支持视频**）
+  └─ Yes & 只需要看**图片** → Grok 4.7 Fast / Gemini 3.8 Flash（都快）
   └─ No → 继续
 
 任务是高难度编码？
@@ -94,7 +96,8 @@
 
 **禁止做法**：
 - ❌ 把多模态任务交给 ZCode GLM-5.3（它没有多模态，调 GLM-4.7 工具效果差）
-- ❌ 把需要听声音的任务交给 ZCode GLM-5.3-Flash（它听不到）
+- ❌ 把需要看**视频**的任务交给 Grok/Antigravity（它们**不支持视频**）
+- ❌ 把代码/推理任务交给 ZCode GLM-5.3-Flash（它在非多模态任务时蠢）
 - ❌ 因为"ZCode 额度最多"就优先用它（应该按专长选）
 
 **允许的变通**：
@@ -200,10 +203,10 @@ else:
 | 多步推理 | ✓ 50-52s | 未测 | 未测 | Grok Build |
 | 代码生成（普通） | ✓ 50s | 未测 | 未测 | Grok Build |
 | 代码生成（高难度） | 未测 | 未测 | 未测 | ZCode GLM-5.3 |
-| 代码分析 | 未测 | 未测 | ✓ 67s | Grok Build / ZCode |
-| 图片分析（快速） | ✓ 17.6s（通过 agy CLI） | 未测 | ✗ 慢且蠢 | Grok 4.7 Fast / Gemini 3.8 |
-| 视频分析（有声音） | 未测 | 未测 | ✗ 听不到 | Grok Build / Antigravity |
-| 视频分析（无声） | 未测 | 未测 | ✗ 蠢 | Grok 4.7 Fast / Gemini 3.8 |
+| 代码分析 | 未测 | 未测 | ✓ 67s | Grok Build / ZCode GLM-5.3 |
+| 图片分析（快速） | ✓ 17.6s | 未测 | ✗ 慢 | Grok 4.7 Fast / Gemini 3.8 |
+| 视频分析（有声音） | ✗ 不支持视频 | ✗ 不支持视频 | ⚠️ 能看但听不到 | ZCode GLM-5.3-Flash（妥协方案） |
+| 视频分析（无声音/可接受无声） | ✗ 不支持视频 | ✗ 不支持视频 | ✓ 能看 | ZCode GLM-5.3-Flash（唯一选项） |
 | 顶级任务 | - | ✓ Opus 4.6 | - | Antigravity Opus 4.6 |
 
 **模型智商排序**（从高到低）：
@@ -222,7 +225,9 @@ else:
 | SendMessage 给已完成 agent | 静默失败，无结果 | 无存活检查 | 只在必要时用 SendMessage |
 | 假设分派即完成 | Agent 退出但工作未开始 | 未验证执行 | 等 task-notification |
 | 顺序启动任务 | 总耗时 = 所有任务之和 | 串行思维 | 一次性启动所有独立任务 |
-| 把多模态任务给 ZCode GLM-5.3 | 效果差 | GLM-5.3 无多模态 | 用 Grok/Antigravity |
+| 把多模态任务给 ZCode GLM-5.3 | 效果差 | GLM-5.3 无多模态 | 用 Grok/Antigravity 看图 |
+| 把视频任务给 Grok/Antigravity | 失败 | 不支持视频 | 用 ZCode GLM-5.3-Flash |
+| 把代码任务给 GLM-5.3-Flash | 慢且蠢 | Flash 只擅长多模态 | 用 GLM-5.3 或 Grok |
 | 因为额度多就优先用 | 任务不匹配 | 忽略专长 | 按任务类型选 |
 
 ## 使用示例
