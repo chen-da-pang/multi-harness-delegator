@@ -1,8 +1,18 @@
-# ZCode Analysis 模板
+# ZCode 任务模板
 
-用于代码分析和架构理解，利用 GLM-5.3 的长上下文和始终推理能力。
+**优先使用 ZCode**（套餐额度最多），适合批量、长任务。
 
-**模型**：GLM-5.3/GLM-5.3-Flash (Z.ai)，1M 上下文，128K 输出，3 档推理级别（始终开启）
+**模型选项**：
+- **GLM-5.3** (Z.ai)：标准质量
+- **GLM-5.3-Flash** (Z.ai)：更快但质量略低
+
+**能力**：
+- 1M 上下文、128K 输出
+- 始终推理（3 档级别，无法关闭）
+- 代码分析/生成、长文档处理
+- **能看图片/视频**（但比 Antigravity 慢）
+
+**套餐状态**：✓ 额度最多，应优先使用
 
 ## 代码结构分析模板
 
@@ -213,13 +223,40 @@ Output structured JSON:
 - 桥接：通过 stdio 连接 ACP 桥
 - 输出：结构化 JSON
 
+## 图片/视频分析模板（ZCode 也能做）
+
+```
+Analyze image/video at <file path>.
+
+Extract:
+- Visual theme
+- Dominant emotions
+- Key elements
+- Color palette
+
+Output structured JSON.
+
+Note: ZCode's GLM-5.3-Flash can handle images/videos but is slower than Antigravity's Gemini 3.8.
+Use ZCode for batch analysis (cost-effective) or when not time-sensitive.
+```
+
 ## 使用建议
 
-- **优先用于**：代码分析、长文件理解、架构文档生成
-- **上下文优势**：1M tokens（可分析大型代码库）
+- **优先用于**：大部分任务（额度最多 ✓）
+  - 代码分析/生成
+  - 长文档处理
+  - 批量图片/视频分析（不急的）
+  - 需要大输出的任务（128K 上限）
+- **上下文优势**：1M tokens
 - **输出优势**：128K tokens（可生成详细架构报告）
-- **推理模式**：始终推理，3 档级别（无法关闭）
-- **ACP 桥延迟**：67s（比直接 CLI 慢，但可用）
+- **推理模式**：始终推理，3 档级别
+- **多模态**：能看图片/视频，但比 Antigravity 慢
+
+## 何时不用 ZCode
+
+- X (Twitter) 数据 → 用 Grok Build（X API 访问权）
+- 图片/视频需要快速结果（<20s）→ 用 Antigravity（Gemini 快）
+- 关键任务需要最强模型 → 用 Antigravity Opus 4.6
 
 ## ACP 桥集成
 

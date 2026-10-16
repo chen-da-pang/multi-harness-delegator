@@ -11,16 +11,17 @@
 
 ## 可用 Harness 清单
 
-| Harness | 模型 | 上下文 | 特点 |
-|---------|------|--------|------|
-| **Grok Build** | Grok 4.6/4.7 (xAI) | 500K | X API 访问权、4 档推理级别、开源 |
-| **Antigravity CLI (agy)** | Gemini 3.8 Flash (Google) | 1M | 大上下文、Go 架构性能好、MCP 支持 |
-| **ZCode** | GLM-5.3 (Z.ai) | 1M | 始终推理、128K 输出、长任务优化 |
+| Harness | 模型选项 | 上下文 | 特点 | 套餐状态 |
+|---------|---------|--------|------|----------|
+| **Grok Build** | Grok 4.6/4.7 (xAI) | 500K | X API 访问权、4 档推理级别、开源 | 普通 |
+| **Antigravity CLI (agy)** | Gemini 3.8 Flash / Claude Sonnet 4.6 / Opus 4.6 | 1M | 多模型选择、Go 性能、MCP 支持 | 普通 |
+| **ZCode** | GLM-5.3 / GLM-5.3-Flash | 1M | 视频/图片分析（慢）、128K 输出、始终推理 | **额度最多** ✓ |
 
 **关键认知**：
 - 三个都是**通用 agent harness**，能力高度重叠
 - 区别在**速度/成本/专长/访问权限**，不是独占能力
 - 都支持：代码生成、搜索、多模态、tool use、子 agent
+- **成本策略**：ZCode 套餐额度最多，应优先使用
 
 ## 工作流程
 
@@ -41,46 +42,51 @@
 
 ### 2. Harness 选择逻辑（你做）
 
+**核心原则**：ZCode 套餐额度最多，**优先使用 ZCode**，除非它做不了或太慢。
+
 **决策树**：
 
 ```
 任务需要 X (Twitter) 数据？
-  └─ Yes → Grok Build（唯一有 X API 访问权，xAI 是 X 家的）
+  └─ Yes → Grok Build（唯一有 X API 访问权）
   └─ No → 继续
 
-任务需要 ≥500K 上下文？
-  └─ Yes → Antigravity / ZCode（1M 上下文）
+任务需要极快速度（<20s）？
+  └─ Yes & 图片/视频 → Antigravity（Gemini 多模态快）
+  └─ Yes & 其他 → Grok Build（验证过 17.6s）
   └─ No → 继续
 
-任务需要大量输出（≥50K tokens）？
-  └─ Yes → ZCode（128K 输出上限）
+任务需要顶级模型（Claude Opus）？
+  └─ Yes → Antigravity（可选 Opus 4.6）
   └─ No → 继续
 
-任务是长时间开发任务（多步骤代码修改）？
-  └─ Yes → ZCode（长任务优化、始终推理）
-  └─ No → 继续
-
-默认选择：
-  - Grok Build：推理任务、X 相关
-  - Antigravity：速度优先、Google 生态集成
-  - ZCode：代码生成、长上下文需求
+默认选择：ZCode
+  - 额度最多 ✓
+  - 能看图片/视频（虽然慢）
+  - 128K 输出
+  - 适合：代码分析、代码生成、长文档、批量任务
 ```
+
+**成本意识**：
+- ZCode 额度充足 → 大部分任务走 ZCode
+- Grok/Antigravity → X 数据、速度关键、需要特定模型
 
 **已验证的性能数据**（从并行测试）：
 
-| 任务类型 | Grok Build | Antigravity | ZCode | 选择建议 |
-|---------|-----------|------------|-------|---------|
-| 结构化输出（JSON schema） | ✓ 120s | 未测 | 未测 | Grok Build（有 `--json-schema` 验证） |
-| 外部工具集成 | ✓ 17.6s | 未测 | 未测 | Grok Build（验证过调用 agy CLI） |
-| 多步推理 | ✓ 50-52s | 未测 | 未测 | Grok Build（验证过 4 次工具调用） |
-| 代码生成 | ✓ 50s | 未测 | 未测 | Grok Build / ZCode |
-| 代码分析 | 未测 | 未测 | ✓ 67s | ZCode（验证过 ACP 桥） |
-| 图片分析 | ✓ 17.6s（通过 agy CLI） | 未测 | 未测 | Antigravity（Gemini 多模态） |
+| 任务类型 | Grok Build | Antigravity | ZCode | 推荐 |
+|---------|-----------|------------|-------|------|
+| 结构化输出（JSON schema） | ✓ 120s | 未测 | 未测 | ZCode（额度优先） |
+| 外部工具集成 | ✓ 17.6s | 未测 | 未测 | Grok Build（快） |
+| 多步推理 | ✓ 50-52s | 未测 | 未测 | ZCode（额度优先） |
+| 代码生成 | ✓ 50s | 未测 | 未测 | ZCode（额度优先） |
+| 代码分析 | 未测 | 未测 | ✓ 67s | ZCode（验证过） |
+| 图片分析（快速） | ✓ 17.6s（通过 agy CLI） | 未测 | 慢（GLM-5.3-Flash） | Antigravity（Gemini 快） |
+| 图片分析（批量/不急） | 未测 | 未测 | 慢 | ZCode（额度优先） |
+| 顶级任务（需要最强模型） | - | ✓ Opus 4.6 | - | Antigravity |
 
-**成本考量**（需实测）：
-- 上下文大小 → 影响成本
-- 推理级别 → Grok 4 档、ZCode 3 档
-- 输出长度 → ZCode 支持更长输出
+**模型选择补充**：
+- Antigravity 内可选：Gemini 3.8 Flash（快）、Claude Sonnet 4.6（平衡）、Opus 4.6（最强）
+- ZCode 内可选：GLM-5.3（标准）、GLM-5.3-Flash（快但质量略低）
 
 ### 3. 委派任务（关键！）
 

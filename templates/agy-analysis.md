@@ -1,8 +1,13 @@
 # Antigravity CLI (agy) Analysis 模板
 
-用于图片/视频内容分析，利用 Gemini 多模态能力。
+用于图片/视频快速分析、顶级任务。
 
-**模型**：Gemini 3.8 Flash (Google)，1M 上下文，高推理级别
+**模型选项**：
+- **Gemini 3.8 Flash** (Google)：快速、多模态强
+- **Claude Sonnet 4.6** (Anthropic)：平衡质量和速度
+- **Claude Opus 4.6** (Anthropic)：最强模型，用于关键任务
+
+**上下文**：1M tokens
 
 ## 图片分析模板
 
@@ -161,10 +166,23 @@ Output structured JSON:
 
 ## 使用建议
 
-- **优先用于**：图片/视频分析（Gemini 3.8 多模态能力强）
+- **优先用于**：
+  - 图片/视频快速分析（Gemini 3.8 多模态快）
+  - 关键任务需要最强模型（切换到 Opus 4.6）
+  - 速度优先的任务（17.6s 验证）
+- **模型选择**：
+  - 图片/视频 → Gemini 3.8 Flash（多模态专长）
+  - 复杂推理 → Claude Sonnet 4.6（平衡）
+  - 关键任务 → Claude Opus 4.6（最强）
 - **上下文优势**：1M tokens（可处理大批量图片）
 - **速度**：17.6s（已验证，快速）
 - **命令行调用**：可作为 CLI 子进程集成到 Grok Build 任务中
+
+## 何时不用 Antigravity
+
+- 不急的批量图片/视频分析 → 用 ZCode（额度更多，虽然慢）
+- X (Twitter) 数据 → 用 Grok Build（X API 访问权）
+- 普通任务 → 用 ZCode（额度优先）
 
 ## 与 Grok Build 集成
 
