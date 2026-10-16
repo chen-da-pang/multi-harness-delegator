@@ -57,42 +57,44 @@
 ```
 用户请求
   ↓
-[你] 分解成 3-8 个可并行子任务
+能分解吗？
+  No → 单任务执行
+  Yes ↓
+子任务是否独立？
+  Yes → 并行（Fan-out）
+  No → 串行（Pipeline）
+  ↓
+[你] 分解成 3-8 个子任务
   ↓
 [你] 写 spec ticket（如果复杂）
 ```
 
+**并行 vs 串行判断**：
+- **独立任务** → 并行：10 张图片分析、多数据源调研、前后端分层开发
+- **依赖关系** → 串行：视频→代码（能力约束）、调研→实现（输出作输入）
+
 ### 2. Harness 选择逻辑（你做）
 
-**按任务类型选择，不按额度**（详见上方能力矩阵）：
+**快速决策卡**（详见能力矩阵）：
 
-```
-任务需要 X (Twitter) 数据？
-  └─ Yes → Grok Build（唯一有 X API 访问权）
-  └─ No → 继续
+🎯 **硬约束优先**
+- X 数据 → Grok Build
+- 视频 → ZCode GLM-5.3-Flash
+- 高难度编码 → ZCode GLM-5.3
+- 顶级模型 → Antigravity Opus 4.6
 
-任务需要多模态（看图/视频/听声音）？
-  └─ Yes & 需要看**视频** → ZCode GLM-5.3-Flash（唯一支持）
-  └─ Yes & 需要听**声音** → Grok Build / Antigravity（不支持视频）
-  └─ Yes & 只需要看**图片** → Grok 4.7 Fast / Gemini 3.8 Flash（都快）
-  └─ No → 继续
+📸 **多模态任务**
+- 图片 → Grok 4.7 Fast / Gemini 3.8
+- 音频 → Grok Build / Antigravity
+- 视频 → ZCode GLM-5.3-Flash
 
-任务是高难度编码？
-  └─ Yes → ZCode GLM-5.3（编码专长）
-  └─ No → 继续
+🔧 **通用任务**
+- 默认 → Grok Build（额度多、能力全面）
 
-任务需要顶级模型？
-  └─ Yes → Antigravity Opus 4.6（最强）
-  └─ No → 继续
-
-默认选择：Grok Build（额度多、能力全面）
-```
-
-**禁止做法**（详见能力矩阵）：
-- ❌ 把多模态任务交给 ZCode GLM-5.3（无多模态能力）
-- ❌ 把视频任务交给 Grok/Antigravity（不支持视频）
-- ❌ 把代码/推理任务交给 GLM-5.3-Flash（非多模态任务时蠢）
-- ❌ 因为"ZCode 额度最多"就优先用它（应该按专长选）
+⚠️ **禁止**
+- 视频 → Grok/Antigravity ❌
+- 多模态 → ZCode GLM-5.3 ❌
+- 代码/推理 → GLM-5.3-Flash ❌
 
 **允许的变通**：
 - 如果必须用 ZCode GLM-5.3 处理有图片的任务 → 先用 Grok/Antigravity 看完图，用文字描述给 ZCode
