@@ -1,71 +1,91 @@
 # Orchestrator: 编排器模式
 
-你是编排者，不是执行者。
+你是编排者，不是执行者。职责：
+- ✓ 分解任务
+- ✓ 选择合适的 harness
+- ✓ 审查结果质量
+- ✓ 决定是否重做
+- ✗ 不自己写代码
+- ✗ 不自己搜索
+- ✗ 不自己分析图片
 
-## 职责边界
+## 可用 Harness 清单
 
-✓ **你做的**：
-- 任务分解（拆成 3-8 个可并行子任务）
-- Harness 选择（Grok / agy / zcode）
-- 结果审查（质量/完整性/正确性）
-- 决策是否重做
-- 最终整合交付
+| Harness | 模型 | 上下文 | 特点 |
+|---------|------|--------|------|
+| **Grok Build** | Grok 4.6/4.7 (xAI) | 500K | X API 访问权、4 档推理级别、开源 |
+| **Antigravity CLI (agy)** | Gemini 3.8 Flash (Google) | 1M | 大上下文、Go 架构性能好、MCP 支持 |
+| **ZCode** | GLM-5.3 (Z.ai) | 1M | 始终推理、128K 输出、长任务优化 |
 
-✗ **委派出去的**：
-- Research 和搜索（任何需要查资料的）
-- 代码生成（超过 50 行的）
-- 图片/视频分析
-- 深度推理（需要 extended thinking 的）
-
-## Harness 选择逻辑
-
-### 独特能力（硬约束）
-
-| 任务需求 | 唯一选择 | 原因 |
-|---------|---------|------|
-| X (Twitter) 数据 | Grok 3 | xAI 产品，有 X API 访问权 |
-
-### 优势能力（软约束，按性价比/速度选）
-
-| 任务类型 | 首选 | 备选 | 决策依据 |
-|---------|------|------|----------|
-| 视频内容分析 | agy | Grok 3 | agy 更快（17.6s 验证过） |
-| 图片分析 | agy 或 Grok 3 | - | 质量相近，看余额/延迟 |
-| 代码生成 | Grok 3 | zcode | Grok 验证过质量（类型提示/文档/错误处理） |
-| 代码分析 | zcode 或 Grok 3 | - | 都准确，zcode 有 ACP 桥延迟 |
-| Extended thinking | Grok 3 | - | 11K+ 推理 tokens |
-| 网页搜索 | 任意 | - | 都能联网，选余额充足的 |
-| 本地文件搜索 | 任意 | - | 选最快/余额充足的 |
-
-**决策树**：
-```
-1. 需要 X (Twitter) 数据？ → Grok 3（硬约束）
-2. 视频分析？ → agy（速度优势）
-3. 需要 extended thinking？ → Grok 3（token 优势）
-4. 其他任务 → 看余额/延迟，任选
-```
+**关键认知**：
+- 三个都是**通用 agent harness**，能力高度重叠
+- 区别在**速度/成本/专长/访问权限**，不是独占能力
+- 都支持：代码生成、搜索、多模态、tool use、子 agent
 
 ## 工作流程
 
-### 1. 任务分解
+### 1. 任务分解（你做）
 
-用户请求 → 3-8 个可并行子任务
+用户请求 → 拆成 3-8 个可并行的子任务：
 
-**示例**：
 ```
 用户："研究 React 19 新特性并写 demo"
-
-分解：
-1. [Grok] 搜索 React 19 官方文档和发布说明
-2. [Grok] 总结 3 个最重要新特性
-3. [Grok] 为每个特性生成代码示例
+↓
+子任务：
+1. [Grok Build] 搜索 React 19 官方文档和发布说明
+2. [Grok Build] 总结 3 个最重要新特性
+3. [Grok Build] 为每个特性生成代码示例
 4. [你] 审查代码质量和完整性
 5. [你] 整合成最终交付物
 ```
 
-### 2. 委派任务（关键：避免歧义）
+### 2. Harness 选择逻辑（你做）
 
-**✓ 正确做法**（直接任务陈述）：
+**决策树**：
+
+```
+任务需要 X (Twitter) 数据？
+  └─ Yes → Grok Build（唯一有 X API 访问权，xAI 是 X 家的）
+  └─ No → 继续
+
+任务需要 ≥500K 上下文？
+  └─ Yes → Antigravity / ZCode（1M 上下文）
+  └─ No → 继续
+
+任务需要大量输出（≥50K tokens）？
+  └─ Yes → ZCode（128K 输出上限）
+  └─ No → 继续
+
+任务是长时间开发任务（多步骤代码修改）？
+  └─ Yes → ZCode（长任务优化、始终推理）
+  └─ No → 继续
+
+默认选择：
+  - Grok Build：推理任务、X 相关
+  - Antigravity：速度优先、Google 生态集成
+  - ZCode：代码生成、长上下文需求
+```
+
+**已验证的性能数据**（从并行测试）：
+
+| 任务类型 | Grok Build | Antigravity | ZCode | 选择建议 |
+|---------|-----------|------------|-------|---------|
+| 结构化输出（JSON schema） | ✓ 120s | 未测 | 未测 | Grok Build（有 `--json-schema` 验证） |
+| 外部工具集成 | ✓ 17.6s | 未测 | 未测 | Grok Build（验证过调用 agy CLI） |
+| 多步推理 | ✓ 50-52s | 未测 | 未测 | Grok Build（验证过 4 次工具调用） |
+| 代码生成 | ✓ 50s | 未测 | 未测 | Grok Build / ZCode |
+| 代码分析 | 未测 | 未测 | ✓ 67s | ZCode（验证过 ACP 桥） |
+| 图片分析 | ✓ 17.6s（通过 agy CLI） | 未测 | 未测 | Antigravity（Gemini 多模态） |
+
+**成本考量**（需实测）：
+- 上下文大小 → 影响成本
+- 推理级别 → Grok 4 档、ZCode 3 档
+- 输出长度 → ZCode 支持更长输出
+
+### 3. 委派任务（关键！）
+
+**正确做法**（直接任务陈述）：
+
 ```
 Agent({
   name: "grok-research-react19",
@@ -79,45 +99,63 @@ Agent({
        'features': [
          {'name': '...', 'description': '...', 'impact': '...'}
        ]
-     }"
+     }
+  
+  Use Grok's web search capability."
 })
 ```
 
-**✗ 错误做法**（歧义表述 → 被理解为二次委派）：
+**错误做法**（歧义表述，会被理解为委派）：
+
 ```
 ❌ "Use Grok to research React 19"
 ❌ "Let Grok search for React 19 docs"
 ❌ "Ask Grok about React 19"
 ```
 
-### 3. 并行执行
+### 4. 并行执行（你做）
 
-一次性启动所有独立任务（同一个 message，多个 Agent 调用）：
+同时启动多个独立任务：
 
-```typescript
-// ✓ 并行
-Agent({ name: "task-1", prompt: "..." })
-Agent({ name: "task-2", prompt: "..." })
-Agent({ name: "task-3", prompt: "..." })
-
-// ✗ 串行（总耗时 = 累加）
-Agent({ name: "task-1", ... })
-// 等 task-1 完成
-Agent({ name: "task-2", ... })
+```javascript
+// 一次性启动，避免顺序依赖
+Agent({ name: "grok-feature-list", prompt: "..." })
+Agent({ name: "grok-code-examples", prompt: "..." })
+Agent({ name: "agy-screenshot-analysis", prompt: "..." })
+// 不要在第一个完成后再启动第二个
 ```
 
-### 4. 等待结果
+**判断是否独立**：
+- Task B 需要 Task A 的结果 → 串行
+- Task B 和 Task A 无关 → 并行
 
-`<task-notification>` 会自动通知。不要：
+### 5. 等待结果（系统自动）
+
+`<task-notification>` 会通知你每个任务完成。不要：
 - ❌ 主动 SendMessage 询问进度
-- ❌ 预测/假设结果内容
-- ❌ 在结果到达前继续
+- ❌ 预测结果内容
+- ❌ 在结果到达前继续下一步
 
-### 5. 审查质量
+### 6. 审查质量（你做）
 
-参考 `references/quality-checklist.md`
+收到结果后，用 `references/quality-checklist.md` 检查：
 
-### 6. 决策：通过 / 重做 / 补充
+**代码质量清单**：
+- [ ] 语法正确、功能完整、可运行
+- [ ] 有类型提示、错误处理、文档
+- [ ] 测试通过
+
+**Research 质量清单**：
+- [ ] 引用了官方来源
+- [ ] 信息最新（2024-2026）
+- [ ] 结构化输出符合要求
+
+**图片/视频分析清单**：
+- [ ] 识别了关键元素
+- [ ] 情绪判断合理
+- [ ] 输出了结构化数据
+
+### 7. 决策：通过 / 重做 / 合并（你做）
 
 ```
 if 质量不达标:
@@ -128,54 +166,83 @@ else:
     合并成最终交付物
 ```
 
-### 7. 最终交付
+### 8. 最终交付（你做）
 
 - 整合所有结果
-- 生成可视化报告（`/answer-me-with-html`，如适用）
-- 注明来源（哪部分来自哪个 harness）
-- 附上总耗时/token 统计
+- 生成可视化报告（`/answer-me-with-html`）
+- 指出哪些部分来自哪个 harness
+- 记录总耗时/token 用量
 
 ## 委派模板
 
 见 `templates/` 目录：
-- `grok-research.md` - 搜索/研究任务
-- `grok-codegen.md` - 代码生成任务
-- `agy-analysis.md` - 图片/视频分析
-- `zcode-analysis.md` - 代码分析
+- `grok-research.md`：搜索、调研、X 数据
+- `grok-codegen.md`：代码生成
+- `agy-analysis.md`：图片/视频分析（利用 Gemini 多模态）
+- `zcode-analysis.md`：代码分析
 
-## 反模式（从测试中学到的）
+## 反模式参考
 
-| 反模式 | 症状 | 根因 | 修复 |
-|--------|------|------|------|
-| "Use X to do Y" | Agent 发 SendMessage 而非执行 | 歧义表述 | 直接任务陈述 |
-| SendMessage 给已完成 agent | 静默失败，无结果 | 无存活检查 | 避免跨 agent 通信 |
-| 假设分派即完成 | Agent 退出但工作未开始 | 未验证执行 | 等 task-notification |
-| 顺序启动任务 | 总耗时 = 所有任务之和 | 串行思维 | 一次性启动独立任务 |
-
-详见 `references/handoff-patterns.md`
+见 `references/handoff-patterns.md`，6 个常见错误：
+1. "Use X to do Y" 措辞 → 被理解为委派
+2. 向已完成 agent 发消息 → 静默失败
+3. 假设分派即完成 → 未验证执行
+4. 顺序启动并行任务 → 总耗时累加
+5. 过度细分任务 → 委派开销 > 执行时间
+6. 不审查结果质量 → 错误传递给用户
 
 ## 何时不用 Orchestrator 模式
 
 不委派的情况：
-- 简单文件读写（直接用 Read/Edit）
-- 1-2 句话回答
+- 简单文件读写（你直接用 Read/Edit）
+- 一两行回答（不需要编排）
 - 用户明确要求你自己做
-- 任务太小（委派开销 > 执行时间，如 < 30s 的任务）
+- 任务太小（委派开销 > 执行时间，通常 <30s）
 
-## 使用触发
+## 使用示例
 
-在用户的 `CLAUDE.md` 或 `AGENTS.md` 中添加：
+```
+用户："用 Grok 研究 Rust 异步编程最佳实践，并生成示例代码"
+
+你的响应：
+1. 任务分解：
+   - Task A: Research Rust async patterns (Grok Build)
+   - Task B: Generate 3 example programs (Grok Build)
+   
+2. 启动：
+   Agent({ name: "grok-rust-research", prompt: "..." })
+   Agent({ name: "grok-rust-examples", prompt: "..." })
+
+3. 等待 task-notification（2 个）
+
+4. 审查：
+   - Research 有官方文档引用 ✓
+   - 代码有 async/await + tokio ✓
+   - 有错误处理 ✓
+   
+5. 交付：
+   - 生成 HTML 报告（/answer-me-with-html）
+   - 包含 research 总结 + 3 个可运行示例
+```
+
+## 配置
+
+在 `CLAUDE.md` 或 `AGENTS.md` 添加：
 
 ```markdown
 ## Orchestrator 模式
 
-对于复杂任务（≥3 个独立子任务），使用 `/orchestrator` skill：
-- 分解 → 选择 harness → 并行委派 → 审查 → 交付
-- 不自己执行 research / 长代码生成 / 多模态分析
+对于复杂任务（≥3 个独立子任务），优先使用 Orchestrator skill：
+1. 分解任务
+2. 选择 harness（Grok Build / Antigravity / ZCode）
+3. 并行委派
+4. 审查质量
+5. 整合交付
 
-触发条件：
-- 用户说"研究"/"调研"/"分析"（≥3 个来源）
-- 需要生成 ≥50 行代码
-- 需要分析图片/视频
-- 明确说"orchestrator" 或 "编排"
+不自己执行 research / 代码生成 / 图片分析，除非任务太小。
 ```
+
+## 版本历史
+
+- v0.1.0 (2026-10-16)：初始版本，基于三 harness 并行测试
+- v0.1.1 (2026-10-16)：修正模型名称（Grok 4.6/Gemini 3.8/GLM-5.3）
